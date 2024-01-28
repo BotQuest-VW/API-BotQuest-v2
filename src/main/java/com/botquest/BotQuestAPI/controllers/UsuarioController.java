@@ -1,5 +1,6 @@
 package com.botquest.BotQuestAPI.controllers;// Importa as anotações e classes necessárias
 
+import com.botquest.BotQuestAPI.dtos.ImagemDto;
 import com.botquest.BotQuestAPI.dtos.UsuarioDto;
 import com.botquest.BotQuestAPI.models.ChamadoModel;
 import com.botquest.BotQuestAPI.models.SetorModel;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -152,6 +154,31 @@ public class UsuarioController {
         // Salva o usuário atualizado no banco de dados e retorna com código de status CREATED
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRepository.save(usuario));
     }
+
+
+    //método para editar apenas a imagem do usuário
+    @PutMapping(value = "/editar-imagem/{idUsuario}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Object> editarImagemUsuario(@PathVariable(value = "idUsuario") UUID id, @RequestParam("url_img") MultipartFile file) {
+        Optional<UsuarioModel> usuarioBuscado = usuarioRepository.findById(id);
+
+        if (usuarioBuscado.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario não encontrado");
+        }
+
+        UsuarioModel usuario = usuarioBuscado.get();
+        String urlImagem;
+
+        try {
+            urlImagem = fileUploadService.fazerUpload(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        usuario.setUrl_img(urlImagem);
+
+        return ResponseEntity.status(HttpStatus.OK).body(usuarioRepository.save(usuario));
+    }
+
 
     // Endpoint para deletar um usuário por ID
     @DeleteMapping("/{idUsuario}")
