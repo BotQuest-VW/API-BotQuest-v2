@@ -23,7 +23,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     UsuarioRepository usuarioRepository;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals("/usuario")){
+        if (request.getRequestURI().equals("/usuario") && request.getMethod().equals("GET")){
             filterChain.doFilter(request, response);
             return;
         }
@@ -32,8 +32,11 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (token != null) {
             var email = tokenService.validarToken(token);
+
             UserDetails usuario = usuarioRepository.findByEmail(email);
+
             var autenticacao = new UsernamePasswordAuthenticationToken(usuario,null, usuario.getAuthorities());
+
             SecurityContextHolder.getContext().setAuthentication(autenticacao);
         }
 
