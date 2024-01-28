@@ -39,6 +39,7 @@ public class UsuarioModel implements Serializable, UserDetails {
     private String email;
     private String senha;
     private int vw_id;
+    private String url_img;
 
     @Temporal(TemporalType.DATE)
     private Date data_nascimento;

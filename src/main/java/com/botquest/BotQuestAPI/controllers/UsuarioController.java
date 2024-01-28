@@ -7,10 +7,12 @@ import com.botquest.BotQuestAPI.models.UsuarioModel;
 import com.botquest.BotQuestAPI.repositories.SetorRepository;
 import com.botquest.BotQuestAPI.repositories.UsuarioRepository;
 
+import com.botquest.BotQuestAPI.services.FileUploadService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -31,6 +33,9 @@ public class UsuarioController {
 
     @Autowired
     SetorRepository setorRepository;
+
+    @Autowired
+    FileUploadService fileUploadService;
 
     // Endpoint para listar todos os usuários
     @GetMapping
@@ -71,8 +76,8 @@ public class UsuarioController {
     }
 
     // Endpoint para cadastrar um novo usuário
-    @PostMapping
-    public ResponseEntity<Object> cadastrarUsuario(@RequestBody @Valid UsuarioDto usuarioDto) {
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Object> cadastrarUsuario(@ModelAttribute @Valid UsuarioDto usuarioDto) {
         if(usuarioRepository.findByEmail(usuarioDto.email()) != null) {
             // Verifica se o email já está cadastrado e retorna uma resposta de erro
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esse email já está cadastrado");
@@ -83,6 +88,16 @@ public class UsuarioController {
 
         // Copia as propriedades do DTO para o modelo
         BeanUtils.copyProperties(usuarioDto, usuario);
+
+        String urlImagem;
+
+        try{
+            urlImagem = fileUploadService.fazerUpload(usuarioDto.url_img());
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+
+        usuario.setUrl_img(urlImagem);
 
         // Criptografa a senha
         String senhaCriptografada = new BCryptPasswordEncoder().encode(usuarioDto.senha());
@@ -101,7 +116,7 @@ public class UsuarioController {
     }
 
     // Endpoint para editar um usuário por ID
-    @PutMapping(value = "/{idUsuario}")
+    @PutMapping(value = "/{idUsuario}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Object> editarUsuario(@PathVariable(value = "idUsuario") UUID id, @ModelAttribute @Valid UsuarioDto usuarioDto) {
         // Busca o usuário no banco de dados pelo ID fornecido
         Optional<UsuarioModel> usuarioBuscado = usuarioRepository.findById(id);
@@ -117,6 +132,16 @@ public class UsuarioController {
 
         // Copia as propriedades do DTO para o modelo
         BeanUtils.copyProperties(usuarioDto, usuario);
+
+        String urlImagem;
+
+        try{
+            urlImagem = fileUploadService.fazerUpload(usuarioDto.url_img());
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+
+        usuario.setUrl_img(urlImagem);
 
         // Criptografa a senha
         String senhaCriptografada = new BCryptPasswordEncoder().encode(usuarioDto.senha());
