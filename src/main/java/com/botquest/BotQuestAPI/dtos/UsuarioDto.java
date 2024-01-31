@@ -15,7 +15,7 @@ public record UsuarioDto(
         @NotBlank @Email String email,
         @NotBlank String senha,
         @NotNull int vw_id,
-        @DateTimeFormat(pattern = "dd-MM-yyyy")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         @NotNull Date data_nascimento,
         @NotNull UUID id_setor,
         @NotNull TipoUsuarioModel tipo_usuario,
