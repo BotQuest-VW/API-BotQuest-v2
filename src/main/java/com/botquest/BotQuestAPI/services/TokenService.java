@@ -24,8 +24,10 @@ public class TokenService {
                     .withIssuer("api-botquest")
                     .withSubject(usuario.getEmail())
                     .withClaim("nomeUsuario", usuario.getNome())
+                    .withClaim("idUsuario", usuario.getId().toString())
                     .withExpiresAt(gerarValidadeToken())
                     .sign(algoritmo);
+
 
             return token;
         } catch(JWTCreationException exception) {
