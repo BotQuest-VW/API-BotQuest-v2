@@ -27,6 +27,7 @@ import java.util.UUID;
 
 // Define o controlador para a entidade UsuarioModel
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "/usuario", produces = {"application/json"})
 public class UsuarioController {
     // Injeta a dependência do repositório UsuarioRepository

@@ -18,6 +18,7 @@ import java.util.UUID;
 
 // Define o controlador para a entidade SetorModel
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "/setor", produces = {"application/json"})
 public class SetorController {
     // Injeta a dependência do repositório SetorRepository

@@ -19,6 +19,7 @@ import java.util.UUID;
 
 // Define o controlador para a entidade PerguntaModel
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "/pergunta", produces = {"application/json"})
 public class PerguntaController {
     // Injeta a dependência do repositório PerguntaRepository
